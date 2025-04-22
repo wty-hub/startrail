@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "startrail",
+    "name": "星轨日记",
     "slug": "startrail",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dashi296.reactnativelivemarkdowntest"
+      "package": "com.askyking.startrail"
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +32,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#0f2543"
         }
       ]
     ],
