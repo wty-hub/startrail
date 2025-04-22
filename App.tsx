@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
@@ -7,6 +7,9 @@ import * as eva from "@eva-design/eva";
 import FlashMessage from "react-native-flash-message";
 
 import AppNavigation from "./src/navigation/Navigation";
+
+import test from "./src/db/db-service";
+
 const App = () => {
   return (
     <>
@@ -22,6 +25,11 @@ const App = () => {
             <Text style={styles.subtitle}>Start writing your thoughts today.</Text>
           </View> */}
           <AppNavigation />
+          {__DEV__ && ( // 仅在开发模式下显示按钮
+            <View>
+              <Button title="Run DB Script" onPress={test} />
+            </View>
+          )}
         </SafeAreaProvider>
         <FlashMessage position="top" />
       </ApplicationProvider>
