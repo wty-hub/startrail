@@ -6,9 +6,29 @@ import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import * as eva from "@eva-design/eva";
 import FlashMessage from "react-native-flash-message";
 
+import { useEffect, useState } from "react";
+import {
+  addEntry,
+  getAllEntries,
+  initDB,
+  updateEntry,
+} from "./src/db/diary-db";
+import { DiaryEntry } from "./src/types/types";
+
 import AppNavigation from "./src/navigation/Navigation";
 
+import { test } from "./test";
+
 const App = () => {
+  useEffect(() => {
+    initDB()
+      .then(() => {
+        console.log("Database initialized");
+      })
+      .catch((error) => {
+        console.error("Error initializing database:", error);
+      });
+  });
   return (
     <>
       <IconRegistry icons={EvaIconsPack} />
@@ -25,7 +45,7 @@ const App = () => {
           <AppNavigation />
           {__DEV__ && ( // 仅在开发模式下显示按钮
             <View>
-              <Button title="Run Test Script" onPress={()=>{}} />
+              <Button title="Run Test Script" onPress={test} />
             </View>
           )}
         </SafeAreaProvider>

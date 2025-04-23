@@ -20,9 +20,9 @@ const AppNavagation = () => {
           tabBarInactiveTintColor: "#6c757d",
           tabBarStyle: {
             height: 50,
-            bottom: 35,
-            marginHorizontal: 50,
-            borderRadius: 30,
+            // bottom: 35,
+            // marginHorizontal: 50,
+            // borderRadius: 30,
             position: "absolute",
           },
           tabBarItemStyle: {

@@ -30,18 +30,14 @@
           "backgroundColor": "#0f2543"
         }
       ],
-      "expo-sqlite",
-      {
-        "enableFTS": true,
-        "useSQLCipher": true,
-        "android": {
-          "enableFTS": false,
-          "useSQLCipher": false
-        },
-        "ios": {
-          "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
         }
-      }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

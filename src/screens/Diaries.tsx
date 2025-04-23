@@ -4,20 +4,19 @@ import { Text, View, StyleSheet } from "react-native";
 import { ScreenLayout } from "../components/ScreenLayout";
 import Search from "../components/SearchButton";
 import { List } from "@ui-kitten/components";
+import { DiaryEntry } from "../types/types";
 
 const Diaries = ({ navigation, route }: BottomTabScreenProps<any, any>) => {
+  // 导航栏右侧搜索按钮处理
   const [searchQuery, setSearchQuery] = useState("");
-
   const onSearchToggle = (status: boolean) => {
     if (!status) {
       setSearchQuery("");
     }
   };
-
   const handleSearchInput = (query: string) => {
     setSearchQuery(query);
   };
-
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -26,18 +25,31 @@ const Diaries = ({ navigation, route }: BottomTabScreenProps<any, any>) => {
     });
   }, [navigation]);
 
+  const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+  const [refreshingDiaries, setRefreshingDiaries] = useState(false);
+  const refreshDiaries = () => {
+    setRefreshingDiaries(true);
+
+    setRefreshingDiaries(false);
+  };
+  const filteredData = diaries.filter((item) =>
+    item.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <ScreenLayout>
-      {/* <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Diaries Screen</Text>
-      </View> */}
       {/* <List
-      style={styles.list}
-      contentContainerStyle={styles.contentContainerStyle}
-      data={[]}
-      extraData={[]}
-
-      ></List> */}
+        style={styles.list}
+        contentContainerStyle={styles.contentContainerStyle}
+        data={filteredData}
+        extraData={diaries}
+        renderItem={renderItem}
+        refreshing={isRefreshing}
+        onRefresh={refreshData}
+        ListEmptyComponent={
+          <NoData title="Add a new entry by pressing + button" />
+        }
+      /> */}
     </ScreenLayout>
   );
 };

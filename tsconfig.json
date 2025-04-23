@@ -3,15 +3,15 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "src/db/db-service.test.js", "src/db/db-service.js"  ]
+    "expo-env.d.ts",
+    "src/db/db-service.test.js",
+    "src/db/db-service.js"
+  ]
 }

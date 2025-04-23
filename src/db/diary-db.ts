@@ -1,4 +1,5 @@
 import SQLite from "react-native-sqlite-storage";
+import { DiaryEntry } from "../types/types";
 
 SQLite.enablePromise(true);
 
@@ -9,23 +10,30 @@ export async function initDB() {
   await db.executeSql(`
         CREATE TABLE IF NOT EXISTS diary (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
             content TEXT NOT NULL,
             date TEXT NOT NULL);`);
   return db;
 }
 
-export async function addEntry(title: string, content: string, date: string) {
+async function ensureDBInitialized() {
+  if (!db) {
+    await initDB();
+  }
+}
+
+export async function addEntry(content: string, date: string) {
+  await ensureDBInitialized();
   const result = await db.executeSql(
-    "INSERT INTO diary (title, content, date) VALUES (?, ?, ?)",
-    [title, content, date]
+    "INSERT INTO diary (content, date) VALUES (?, ?)",
+    [content, date]
   );
   return result[0].insertId;
 }
 
 export async function getAllEntries() {
-  const result = await db.executeSql("SELECT * FROM diary ORDER BY date DESC");
-  const entries: { id: number; title: string; content: string; date: string }[] = [];
+  await ensureDBInitialized();
+  const result = await db.executeSql("SELECT * FROM diary");
+  const entries: DiaryEntry[] = [];
   result[0].rows.raw().forEach((row) => {
     entries.push(row);
   });
@@ -33,18 +41,26 @@ export async function getAllEntries() {
 }
 
 export async function getEntryById(id: number) {
-  const results = await db.executeSql('SELECT * FROM diary WHERE id = ?', [id]);
+  await ensureDBInitialized();
+  const results = await db.executeSql("SELECT * FROM diary WHERE id = ?", [id]);
   return results[0].rows.item(0);
 }
 
-
-export async function updateEntry(id: number, title: string, content: string, date: string) {
-  await db.executeSql(
-    "UPDATE diary SET title = ?, content = ?, date = ? WHERE id = ?",
-    [title, content, date, id]
-  );
+export async function updateEntry(id: number, content: string, date: string) {
+  await ensureDBInitialized();
+  await db.executeSql("UPDATE diary SET content = ?, date = ? WHERE id = ?", [
+    content,
+    date,
+    id,
+  ]);
 }
 
 export async function deleteEntry(id: number) {
+  await ensureDBInitialized();
   await db.executeSql("DELETE FROM diary WHERE id = ?", [id]);
+}
+
+export async function clearAllEntries() {
+  await ensureDBInitialized();
+  await db.executeSql("DELETE FROM diary");
 }
