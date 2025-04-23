@@ -8,8 +8,6 @@ import FlashMessage from "react-native-flash-message";
 
 import AppNavigation from "./src/navigation/Navigation";
 
-import test from "./src/db/db-service";
-
 const App = () => {
   return (
     <>
@@ -27,7 +25,7 @@ const App = () => {
           <AppNavigation />
           {__DEV__ && ( // 仅在开发模式下显示按钮
             <View>
-              <Button title="Run DB Script" onPress={test} />
+              <Button title="Run Test Script" onPress={()=>{}} />
             </View>
           )}
         </SafeAreaProvider>

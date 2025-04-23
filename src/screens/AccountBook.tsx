@@ -7,7 +7,7 @@ const AccountBook = ({ navigation, route }: BottomTabScreenProps<any, any>) => {
   return (
     <ScreenLayout>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>AccountBook Screen</Text>
+        <Text>开发中，敬请期待</Text>
       </View>
       {/* <Search onToggle={dummy} />
       <List
