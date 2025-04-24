@@ -3,23 +3,44 @@
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { DiaryEntry } from "../types/types";
 import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import zhLocale from "dayjs/locale/zh-cn";
+import { Icon } from "@ui-kitten/components";
 
-const DiaryCard = ({ entry, onPress, onDelete }: { entry: DiaryEntry; onPress: () => void; onDelete: () => void }) => {
+const DiaryCard = ({
+  entry,
+  onPress,
+  onDelete,
+}: {
+  entry: DiaryEntry;
+  onPress: () => void;
+  onDelete: () => void;
+}) => {
+  dayjs.extend(localeData);
+  dayjs.locale(zhLocale);
   const dateString = dayjs(entry.date).format("YYYY年M月D日 dddd");
+  let intro = entry.content.substr(0, 40);
+  if (intro.length >= 40) {
+    intro += "...";
+  }
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      <Text style={styles.content}>{entry.content}</Text>
-      <Text style={styles.date}>{dateString}</Text>
-      <Pressable onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>删除</Text>
-      </Pressable>
+      <Text style={styles.content}>{intro}</Text>
+      <View style={styles.row}>
+        <Pressable onPress={onDelete} style={styles.deleteButton}>
+          {/* <Text style={styles.deleteButtonText}>删除</Text> */}
+          <Icon name="trash" color="#FF4D4F"/>
+        </Pressable>
+        <Text style={styles.date}>{dateString}</Text>
+      </View>
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
+    marginHorizontal: 8,
     backgroundColor: "#fff",
     padding: 16,
     marginVertical: 8,
@@ -35,17 +56,24 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   date: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 8,
   },
   deleteButton: {
-    marginTop: 8,
     padding: 8,
-    backgroundColor: "#FF4D4F",
-    borderRadius: 4,
+    // backgroundColor: "#FF4D4F",
+    borderWidth: 1,
+    borderRadius: 15,
     alignItems: "center",
+    // width: 30,
+    height: 30,
+    maxHeight: 30,
   },
   deleteButtonText: {
     color: "#fff",
