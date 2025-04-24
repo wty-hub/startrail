@@ -1,5 +1,9 @@
 // 处理日期
 
+import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import zhLocale from "dayjs/locale/zh-cn";
+
 /**
  * dateToString - 将Date对象转换为YYYY-MM-DD格式的字符串
  * @param date - Date对象
@@ -28,7 +32,9 @@ export const getTodayString = function (): string {
 const validateDaystring = function (dayString: string): void {
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   if (!regex.test(dayString)) {
-    throw new Error(`Invalid daystring format: ${dayString}. Expected format is YYYY-MM-DD.`);
+    throw new Error(
+      `Invalid daystring format: ${dayString}. Expected format is YYYY-MM-DD.`
+    );
   }
 };
 
@@ -44,4 +50,17 @@ export const daystringToDate = function (dayString: string): Date {
   const month = parseInt(parts[1], 10) - 1; // Months are zero-based
   const day = parseInt(parts[2], 10);
   return new Date(year, month, day);
+};
+
+/**
+ * 
+ * 将日期字符串转换为本地化的日期字符串
+ * @param daystring - 日期字符串，格式为 YYYY-MM-DD
+ */
+export const daystringToLocalString = function (daystring: string): string {
+  dayjs.extend(localeData);
+  dayjs.locale(zhLocale);
+  const date = daystringToDate(daystring);
+  const dateString = dayjs(date).format("YYYY年M月D日 dddd");
+  return dateString;
 };

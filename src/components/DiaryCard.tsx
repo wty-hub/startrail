@@ -2,10 +2,9 @@
 
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { DiaryEntry } from "../types/types";
-import dayjs from "dayjs";
-import localeData from "dayjs/plugin/localeData";
-import zhLocale from "dayjs/locale/zh-cn";
+
 import { Icon } from "@ui-kitten/components";
+import { daystringToLocalString } from "../utils/date-service";
 
 const DiaryCard = ({
   entry,
@@ -16,14 +15,12 @@ const DiaryCard = ({
   onPress: () => void;
   onDelete: () => void;
 }) => {
-  dayjs.extend(localeData);
-  dayjs.locale(zhLocale);
-  const dateString = dayjs(entry.date).format("YYYY年M月D日 dddd");
+
   let intro = entry.content.substr(0, 40);
   if (intro.length >= 40) {
     intro += "...";
   }
-
+  const dateString = daystringToLocalString(entry.date);
   return (
     <Pressable onPress={onPress} style={styles.card}>
       <Text style={styles.content}>{intro}</Text>

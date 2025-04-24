@@ -1,24 +1,22 @@
-import { addEntry, clearAllEntries, getAllEntries } from "./src/db/diary-db";
+import { addEntry, clearAllEntries, getAllEntries } from "./src/db/diary-service";
+import { DiaryEntry } from "./src/types/types";
 import { daystringToDate, getTodayString } from "./src/utils/date-service";
 
 export const test = () => {
-  // 清空数据库
-  clearAllEntries();
-
-  // 插入测试数据
-  const today = getTodayString();
-  const testEntries = [
-    { content: "测试日记1", date: today },
-    { content: "测试日记2", date: "2025-04-23" },
-    { content: "测试日记3", date: "2025-04-22" },
-  ];
-
-  for (const entry of testEntries) {
-    addEntry(entry.content, entry.date);
+  const testEntries: DiaryEntry[] = [
+    {
+      id: 1,
+      content: "欢迎来到星轨日记！",
+      date: "2025-04-25",
+    },
+  ]
+  for (let e of testEntries) {
+    addEntry(e.content, e.date)
+      .then((id) => {
+        console.log(`Entry added with ID: ${id}`);
+      })
+      .catch((error) => {
+        console.error("Error adding entry:", error);
+      });
   }
-
-  // 获取并打印所有数据
-  getAllEntries().then((entries) => {
-    console.log("所有日记条目：" + JSON.stringify(entries, null, 2));
-  });
 };
