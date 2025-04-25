@@ -30,7 +30,13 @@ const Diaries = ({ navigation }: BottomTabScreenProps<any, any>) => {
     setRefreshingDiaries(true);
     try {
       const data = await getAllEntries(); // 从数据库获取日记
-      setDiaries(data);
+      const sortedData = data.sort((a, b) => {
+        // date 为 YYYY-MM-DD 格式
+        if (a.date < b.date) return 1;
+        if (a.date > b.date) return -1;
+        return 0;
+      });
+      setDiaries(sortedData);
     } catch (error) {
       console.error("Error fetching diaries:", error);
     } finally {
@@ -71,10 +77,10 @@ const Diaries = ({ navigation }: BottomTabScreenProps<any, any>) => {
   const renderItem = ({ item }: { item: DiaryEntry }) => (
     <DiaryCard
       entry={item}
-      onPress={() => {
-        navigation.navigate("DiaryDetail", { diaryId: item.id });
+      onContentPressedCallback={() => {
+        // navigation.navigate("DiaryDetail", { diaryId: item.id });
       }}
-      onDelete={() => {
+      onDeletePressedCallback={() => {
         // 删除日记的逻辑
         console.log(`Delete diary with id: ${item.id}`);
       }}
