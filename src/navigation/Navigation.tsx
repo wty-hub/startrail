@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native";
 import Header from "../components/Header";
 import { Icon } from "@ui-kitten/components";
 import Diaries from "../screens/Diaries";
-import DateSelector from "../screens/DateSelector";
 import AccountBook from "../screens/AccountBook";
+import DateSelector from "../screens/DateSelector";
 
 const Tab = createBottomTabNavigator();
 
@@ -53,6 +53,7 @@ const AppNavagation = () => {
             ),
             // @ts-ignore
             hideBack: true,
+            headerShown: false
           }}
         />
         <Tab.Screen

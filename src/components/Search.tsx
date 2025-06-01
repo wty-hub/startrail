@@ -1,6 +1,11 @@
 import { Button, Icon, Input } from "@ui-kitten/components";
 import { useEffect, useRef, useState } from "react";
-import { ImageProps, StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  ImageProps,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 interface SearchButtonProps {
   onToggle: (status: boolean) => void;
@@ -25,7 +30,6 @@ const Search: React.FC<SearchButtonProps> = ({ onToggle, onChangeText }) => {
 
   useEffect(() => {
     onToggle(inputShown);
-
     if (!inputShown) {
       inputRef.current?.clear();
     }
@@ -59,7 +63,6 @@ const Search: React.FC<SearchButtonProps> = ({ onToggle, onChangeText }) => {
 export default Search;
 
 const SEARCH_HEIGHT = 40;
-
 
 const styles = StyleSheet.create({
   search: {
