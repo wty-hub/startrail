@@ -19,14 +19,12 @@ import {
   getTodayString,
 } from "../../utils/date-service";
 import { DiaryEntry } from "../../types/types";
-import { useDiaryRefresh } from "../../context/DiaryRefreshContext";
 
 const DiaryDetail: React.FC = ({ route, navigation }: any) => {
   const { id }: { id: number } = route.params;
 
   // console.log(`DiaryDetail id: ${id}`);
 
-  const { refresh } = useDiaryRefresh();
 
   const [editingContent, setEditingContent] = useState("");
   const [modified, setModified] = useState(false);
@@ -102,7 +100,7 @@ const DiaryDetail: React.FC = ({ route, navigation }: any) => {
   const handleGoBack = async () => {
     if (modified) {
       await saveBuffer();
-      refresh(); // 调用全局刷新
+      // refresh(); // 调用全局刷新
     }
     navigation.goBack();
   };
