@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Pressable, Text, View, StyleSheet, AppState } from "react-native";
 import { DiaryEntry } from "../types/types";
 import { Icon } from "@ui-kitten/components";
-import { daystringToLocalString } from "../utils/date-service";
+import { daystringToLocalString } from "../utils/date-utils";
 import { updateEntry } from "../db/diary-service";
 
 const DiaryCard = ({
@@ -28,7 +28,7 @@ const DiaryCard = ({
   if (intro.length >= 40) {
     intro += "...";
   }
-  const dateString = daystringToLocalString(entry.date);
+  const dateString = daystringToLocalString(entry.daystring);
 
   return (
     <>

@@ -9,10 +9,11 @@ import {
 import { DiaryEntry } from "@/src/types/types";
 import {
   daystringToLocalString,
-  getTodayString,
-} from "@/src/utils/date-service";
+  getTodayDaystring,
+} from "@/src/utils/date-utils";
 import React, { useState, useCallback, useEffect } from "react";
 import { useDiaryRefresh } from "@/src/context/DiaryRefreshContext";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   FlatList,
   RefreshControl,
@@ -50,8 +51,8 @@ const DiaryList: React.FC = ({ route, navigation }: any) => {
       const data = await getAllEntries(); // 从数据库获取日记
       const sortedData = data.sort((a, b) => {
         // date 为 YYYY-MM-DD 格式
-        if (a.date < b.date) return 1;
-        if (a.date > b.date) return -1;
+        if (a.daystring < b.daystring) return 1;
+        if (a.daystring > b.daystring) return -1;
         return 0;
       });
       setDiaries(sortedData);
@@ -61,20 +62,18 @@ const DiaryList: React.FC = ({ route, navigation }: any) => {
       setRefreshingDiaries(false);
     }
   }, []);
-
   const { setRefresh } = useDiaryRefresh();
   useEffect(() => {
     setRefresh(refreshDiaries);
   }, [refreshDiaries, setRefresh]);
 
   // 使用 useFocusEffect 在屏幕聚焦时刷新数据
-  useEffect(() => {
-    console.log("DiaryList focused, refreshing diaries...");
-    refreshDiaries();
-    return () => {
-      // Cleanup if needed
-    };
-  }, [refreshDiaries]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log("屏幕聚焦，刷新数据");
+      refreshDiaries();
+    }, [refreshDiaries])
+  );
 
   // 设置导航栏右侧的按钮
   React.useEffect(() => {
@@ -90,23 +89,23 @@ const DiaryList: React.FC = ({ route, navigation }: any) => {
     diaries.filter(
       (item) =>
         item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        daystringToLocalString(item.date).includes(searchQuery.toLowerCase())
+        daystringToLocalString(item.daystring).includes(searchQuery.toLowerCase())
     );
 
   // 新增日记的逻辑
   const handleAddDiary = async () => {
-    const todayEntry = await queryEntryByDaystring(getTodayString());
+    const todayEntry = await queryEntryByDaystring(getTodayDaystring());
     if (todayEntry === null) {
       const newDiary: DiaryEntry = {
         id: Date.now(), // 使用时间戳作为唯一 ID
-        date: getTodayString(), // 当前日期
+        daystring: getTodayDaystring(), // 当前日期
         content: "", // 新增日记时内容为空
       };
       // navigation.navigate("DiaryDetail", { id: newDiary.id, refreshHandle: refreshDiaries });
-      navigateToDetail(newDiary.id);
+      navigateToDetail(newDiary.id, newDiary.daystring);
     } else {
       // navigation.navigate("DiaryDetail", { id: todayEntry.id, refreshHandle: refreshDiaries });
-      navigateToDetail(todayEntry.id);
+      navigateToDetail(todayEntry.id, getTodayDaystring());
     }
   };
 
@@ -133,9 +132,10 @@ const DiaryList: React.FC = ({ route, navigation }: any) => {
     setIsConfirmModalVisible(false); // 关闭模态框
   };
 
-  const navigateToDetail = (id: number) => {
+  const navigateToDetail = (id: number, daystring: string) => {
     navigation.navigate("DiaryDetail", {
       id: id,
+      daystring: daystring
       // refreshHandle: refreshDiaries,
     });
   };
@@ -146,7 +146,7 @@ const DiaryList: React.FC = ({ route, navigation }: any) => {
       entry={item}
       onContentPressedCallback={() => {
         // navigation.navigate("DiaryDetail", { id: item.id, refreshHandle: refreshDiaries });
-        navigateToDetail(item.id);
+        navigateToDetail(item.id, item.daystring);
       }}
       onDeletePressedCallback={() => {
         showDeleteConfirm(item); // 调用显示自定义模态框的函数
@@ -169,7 +169,7 @@ const DiaryList: React.FC = ({ route, navigation }: any) => {
         contentContainerStyle={[styles.list, { paddingBottom: 120 }]} // 为底部留出空间
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>还没有日记……按 ‘➕’ 创建一个吧</Text>
+            <Text style={styles.emptyText}>还没有日记……按 ‘今日’ 创建一个吧</Text>
           </View>
         }
         keyboardShouldPersistTaps="handled"

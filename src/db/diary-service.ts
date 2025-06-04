@@ -92,7 +92,7 @@ export function saveOrUpdateDiary(content: string, daystring: string): Promise<n
                   "UPDATE diary SET content = ? WHERE id = ?",
                   [content, existingEntry.id],
                   (_, updateResult) => {
-                    console.log(`日期 ${daystring} 的日记已更新`);
+                    console.log(`日期 ${daystring} 的日记已更新: ${content}`);
                     resolve(existingEntry.id);
                   },
                   (_, error) => {
@@ -149,7 +149,11 @@ export async function getAllEntries() {
   const result = await db.executeSql("SELECT * FROM diary");
   const entries: DiaryEntry[] = [];
   result[0].rows.raw().forEach((row) => {
-    entries.push(row);
+    entries.push({
+      id: row.id,
+      content: row.content,
+      daystring: row.date // 将数据库的 date 字段映射到 DiaryEntry 的 daystring 字段
+    });
   });
   return entries;
 }
@@ -165,20 +169,25 @@ export async function getEntryById(id: number): Promise<DiaryEntry | null> {
   if (results[0].rows.length === 0) {
     return null;
   }
-  return results[0].rows.item(0);
+  const row = results[0].rows.item(0);
+  return {
+    id: row.id,
+    content: row.content,
+    daystring: row.date // 将数据库的 date 字段映射到 DiaryEntry 的 daystring 字段
+  };
 }
 
 /**
  * 更新指定 ID 的日记条目。
  * @param {number} id 条目 ID
  * @param {string} content 日记内容
- * @param {string} date 日期
+ * @param {string} daystring 日期
  */
-export async function updateEntry(id: number, content: string, date: string) {
+export async function updateEntry(id: number, content: string, daystring: string) {
   await ensureDBInitialized();
   await db.executeSql("UPDATE diary SET content = ?, date = ? WHERE id = ?", [
     content,
-    date,
+    daystring, // 将 daystring 参数映射到数据库的 date 字段
     id,
   ]);
 }
@@ -213,5 +222,10 @@ export async function queryEntryByDaystring(daystring: string) {
   if (result[0].rows.length === 0) {
     return null;
   }
-  return result[0].rows.item(0);
+  const row = result[0].rows.item(0);
+  return {
+    id: row.id,
+    content: row.content,
+    daystring: row.date // 将数据库的 date 字段映射到 DiaryEntry 的 daystring 字段
+  };
 }

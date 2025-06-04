@@ -20,7 +20,7 @@ const dateToDaystring = function (date: Date): string {
  * 获取当前的日期
  * @returns {string} - 返回当前日期，格式为 YYYY-MM-DD
  */
-export const getTodayString = function (): string {
+export const getTodayDaystring = function (): string {
   return dateToDaystring(new Date());
 };
 

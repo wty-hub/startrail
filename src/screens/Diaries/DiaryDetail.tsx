@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,99 +10,82 @@ import {
   Easing,
   TouchableOpacity,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import {
-  insertOrUpdateEntryWithId,
   getEntryById,
+  saveOrUpdateDiary,
 } from "../../db/diary-service";
 import {
   daystringToLocalString,
-  getTodayString,
-} from "../../utils/date-service";
+  getTodayDaystring,
+} from "../../utils/date-utils";
 import { DiaryEntry } from "../../types/types";
+import { constant, debounce } from 'lodash';
 
 const DiaryDetail: React.FC = ({ route, navigation }: any) => {
-  const { id }: { id: number } = route.params;
-
-  // console.log(`DiaryDetail id: ${id}`);
-
+  let { id: diaryId, daystring: daystring }: { id: number, daystring: string } = route.params;
 
   const [editingContent, setEditingContent] = useState("");
-  const [modified, setModified] = useState(false);
+  // const [modified, setModified] = useState(false);
   const [appState, setAppState] = useState(AppState.currentState);
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
-  const [dayString, setDayString] = useState(getTodayString());
+  // 这里重复设计了
+  const [dayString, setDayString] = useState(daystring);
 
   const opacityValue = new Animated.Value(1);
 
   const loadDiaryContent = async () => {
-    const entry: DiaryEntry | null = await getEntryById(id);
+    const entry: DiaryEntry | null = await getEntryById(diaryId);
     if (entry !== null) {
       setEditingContent(entry.content);
-      setDayString(entry.date);
+      setDayString(entry.daystring);
     } else {
       setEditingContent("");
-      setDayString(getTodayString());
+      setDayString(getTodayDaystring());
     }
   };
+
+  // 读取日记内容（如果是已有的日记）
   useEffect(() => {
     loadDiaryContent();
   }, []);
 
-  const saveBuffer = async () => {
-    if (modified) {
-      // console.log(`保存日记：${editingContent}`);
-      setModified(false);
-      await insertOrUpdateEntryWithId(id, editingContent, dayString);
-    }
-  };
-
-  const handleContentChange = (content: string) => {
-    setModified(true);
-    setEditingContent(content);
-    console.log(`修改日记：${content}`);
-    if (!timer) {
-      const newTimer = setTimeout(async () => {
-        await saveBuffer();
-        setTimer(null);
-      }, 3000);
-      setTimer(newTimer);
-    }
-  };
-
-  const handleAppStateChange = (nextAppState: string) => {
-    if (modified) {
-      if (appState === "active" && nextAppState.match(/inactive|background/)) {
-        saveBuffer();
-      }
-    }
-  };
-
+  const saveBuffer = useCallback(
+    debounce((text, daystring) => {
+      console.log(`保存内容中，日期：${dayString}，内容：${text}`);
+      saveOrUpdateDiary(text, daystring);
+    }, 1000), []
+  );
   useEffect(() => {
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-
+    const appStateListener = AppState.addEventListener('change', handleAppStateChange);
     return () => {
-      subscription.remove();
+      appStateListener.remove();
     };
-  }, [appState]);
-
-  useEffect(() => {
-    Animated.timing(opacityValue, {
-      toValue: 1,
-      duration: 500,
-      easing: Easing.ease,
-      useNativeDriver: true,
-    }).start();
   }, []);
 
-  const handleGoBack = async () => {
-    if (modified) {
-      await saveBuffer();
-      // refresh(); // 调用全局刷新
+  // 使用 useFocusEffect 在页面失去焦点时保存数据
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        // 页面失去焦点时（即用户离开页面时）保存数据
+        console.log("DiaryDetail losing focus, saving data...");
+        if (editingContent.trim()) {
+          saveOrUpdateDiary(editingContent, dayString);
+        }
+      };
+    }, [editingContent, dayString])
+  );
+  const handleAppStateChange = (nextAppState: any) => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      // 当应用从后台恢复到前台时不做操作
+    } else if (nextAppState === 'background') {
+      // 应用进入后台时保存笔记
+      saveBuffer(editingContent, dayString); // 这里使用当前的 state 值是正确的
     }
-    navigation.goBack();
+    setAppState(nextAppState);
+  };
+  const handleTextChange = (text: string) => {
+    setEditingContent(text);
+    saveBuffer(text, dayString); // 使用参数 text，而不是 state editingContent
   };
 
   return (
@@ -118,7 +101,7 @@ const DiaryDetail: React.FC = ({ route, navigation }: any) => {
           <TextInput
             style={styles.textInput}
             value={editingContent}
-            onChangeText={handleContentChange}
+            onChangeText={handleTextChange}
             multiline={true}
             textAlignVertical="top"
           />
